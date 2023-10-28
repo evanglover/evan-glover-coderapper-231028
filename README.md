@@ -1,3 +1,30 @@
+# Evan Glover Theme Code Challenge for Coderapper Oct 2023
+* **Side Cart** This theme contains an interactive ajax side cart as described in the below requirements.
+Interview Assignment: As part of this code challenge we will be writing a few react
+components that will fetch and display the product information from Shopify and also. As
+prerequisites, please make sure that you have the following setup ready
+1. A Shopify sandbox store with the following data
+i. At least a few in-stock products
+
+Task#1 :
+Implement a simple Shopify side cart in the theme using Javascript/React. If you are familiar
+with other JS frameworks like alpine js to build this component feel free to use them..
+Support the following actions:
+1. Change the quantity of existing cart item (updates state to render the new
+selection and submits to Shopify Ajax cart change).
+2. Remove the item from the cart (updates state to render cart without this item, and
+submit the change to Shopify Ajax cart)
+3. (optional) Conditional upsell product Y will display when product X is present
+in the cart. Add to cart will update the cart state and submit the change to
+Shopify.
+4. (bonus) Disable all controls when a modification is in progress
+
+What we would love to see:
+1. We encourage you to write clean code with documented functions
+2. We would love to see the documentation around API endpoints that are being created in
+your README
+3. Your code should be available for review in a public repository
+
 # Dawn
 
 [![Build status](https://github.com/shopify/dawn/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Shopify/dawn/actions/workflows/ci.yml?query=branch%3Amain)
