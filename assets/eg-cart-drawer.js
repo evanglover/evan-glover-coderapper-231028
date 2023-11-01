@@ -16,6 +16,8 @@ class EGCartDrawer extends HTMLElement {
           this.open(cartLink);
         }
       });
+      // fieldset is used for enabling and disabling the form
+      this.fieldSet = this.querySelector("fieldset");
     }
   
     // open the cart drawe
@@ -32,15 +34,57 @@ class EGCartDrawer extends HTMLElement {
       this.classList.remove('open');
       document.body.classList.remove('overflow-hidden');
     }
+
+    // fetch new cart drawer HTML from a (now updated) cart page.
+    renderCartDrawerUpdates(){
+      // if on the cart page, reload the page
+      if(window.location.pathname == `${routes.cart_url}`){
+        location.reload();
+      } else {
+        // disable the cart form 
+        const selfRef = this;
+        this.cartFormDisable();
+        fetch(`${routes.cart_url}?section_id=eg-cart-drawer`)
+          .then((response) => response.text())
+          .then((responseText) => {
+            const html = new DOMParser().parseFromString(responseText, 'text/html');
+            // replace cart drawer items and cart drawer footer with the updated version
+            const selectors = ['.cart-drawer'];
+            for (const selector of selectors) {
+              const targetElement = document.querySelector(selector);
+              const sourceElement = html.querySelector(selector);
+              if (targetElement && sourceElement) {
+                targetElement.replaceWith(sourceElement);
+              }
+            }
+            
+          })
+          // once complete, enable the cart form
+          .then((info) => {
+            selfRef.cartFormEnable();
+          })
+          // catch errors and print to console
+          .catch((e) => {
+            console.error(e);
+          });
+      }
+    }
+
+    // while the cart is updating, disable all controls and set checkout text to ""
+    cartFormDisable(){
+      this.fieldSet.disabled = true;
+    }
+
+    cartFormEnable(){
+      this.fieldSet.disabled = false;
+    }
   }
 
   // the main quantity input for each line item
   class EGCartDrawerQTY extends HTMLElement {
     constructor() {
         super();
-        
-        this.checkoutButton = document.getElementById("CartDrawer-Checkout");
-        this.fieldSet = this.closest("fieldset");
+                
         // create debounce function at 300ms to prevent api overload
         this.cartUpdateTimeout;
         this.resetCartUpdateTimeout = (event) => {
@@ -99,53 +143,11 @@ class EGCartDrawer extends HTMLElement {
           .then((state) => {
             const parsedState = JSON.parse(state);
             // update new information to the cart
-            this.renderCartDrawerUpdates();
+            this.closest("eg-cart-drawer").renderCartDrawerUpdates();
           });
       }
 
-      // fetch new cart drawer HTML from a (now updated) cart page.
-      renderCartDrawerUpdates(){
-        // if on the cart page, reload the page
-        if(window.location.pathname == `${routes.cart_url}`){
-          location.reload();
-        } else {
-          // disable the cart form
-          const selfRef = this;
-          this.cartFormDisable();
-          fetch(`${routes.cart_url}?section_id=eg-cart-drawer`)
-            .then((response) => response.text())
-            .then((responseText) => {
-              const html = new DOMParser().parseFromString(responseText, 'text/html');
-              // replace cart drawer items and cart drawer footer with the updated version
-              const selectors = ['cart-drawer-items', '.cart-drawer__footer'];
-              for (const selector of selectors) {
-                const targetElement = document.querySelector(selector);
-                const sourceElement = html.querySelector(selector);
-                if (targetElement && sourceElement) {
-                  targetElement.replaceWith(sourceElement);
-                }
-              }
-              
-            })
-            // once complete, enable the cart form
-            .then((info) => {
-              selfRef.cartFormEnable();
-            })
-            // catch errors and print to console
-            .catch((e) => {
-              console.error(e);
-            });
-        }
-      }
-
-      // while the cart is updating, disable all controls and set checkout text to ""
-      cartFormDisable(){
-        this.fieldSet.disabled = true;
-      }
-
-      cartFormEnable(){
-        this.fieldSet.disabled = false;
-      }
+      
   }
 
   // the user clicks the remove button (aka set quantity 0 and trigger update)

@@ -34,12 +34,12 @@
       <div class="cart-drawer-content">
         {%- if cart == empty -%}
         <div class="cart-drawer-empty">
-          <h2 class="cart__empty-text">{{ 'sections.cart.empty' | t }}</h2>
+          <p>{{ 'sections.cart.empty' | t }}</p>
           <a href="{{ routes.all_products_collection_url }}" class="button">
             {{ 'general.continue_shopping' | t }}
           </a>
         </div>
-        {%- endif -%}
+        {%- endif -%} 
         
           <cart-drawer-items class="cart-drawer-items">
           {%- if cart != empty -%}
