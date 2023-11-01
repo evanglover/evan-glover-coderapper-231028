@@ -14,7 +14,7 @@ The side cart supports the following actions:
 
 * There is a conditional upsell product for Y that displays when product X is present in the cart. The add to cart button will update the cart state and submit the change to Shopify.
 
-### eg-cart-drawer.liquid
+eg-cart-drawer.liquid
 ```html
 {% comment %} If product to trigger upsell is present, and upsell product is not present, then show an upsell component for the upsell product {% endcomment %}
 {%- assign upsell_trigger_handles_string = "the-3p-fulfilled-snowboard" -%} 
@@ -88,7 +88,7 @@ The side cart supports the following actions:
 {%- endif -%}
 ```
 
-### eg-cart-drawer.js
+eg-cart-drawer.js
 ```js
 // handles events in the upsell component
   class EGCartDrawerUpsell extends HTMLElement {
@@ -133,7 +133,7 @@ The side cart supports the following actions:
 
 * Both changes in quantity, removal, and  utilize the Shopify Cart API "change" endpoint, which accepts parameters "id" (variant id) and "quantity" in order to edit the line items of the user's cart. The add to cart functionality of the conditional upsell utilizes the Shopify Cart API "add" endpoint which takes the parameters "quanitity" and "id" (variant id). See routes below. Also see functions updateQuantity of class EGCartDrawerQTY and addToCart of EGCartDrawerUpsell in file 'eg-cart-drawer.js'.
 
-### theme.liquid
+theme.liquid
 ``` js
 window.shopUrl = 'https://evan-glover-coderapper-10-28-23.myshopify.com';
 window.routes = {
@@ -147,7 +147,7 @@ window.routes = {
 
 * All controls disable when a modification is in progress, this is achieved by utlizing the html fieldset element to disable all controls of the form simultaneously. 
 
-### eg-cart-drawer.liquid
+eg-cart-drawer.liquid
 ```html
 <eg-cart-drawer class="eg-cart-drawer open{% if cart == empty %} is-empty{% endif %}">
   <div class="cart-drawer-overlay"></div> 
@@ -155,7 +155,7 @@ window.routes = {
     <fieldset>
 ```
 
-### eg-cart-drawer.js 
+eg-cart-drawer.js 
 ```js
 // fetch new cart drawer HTML from a (now updated) cart page.
 renderCartDrawerUpdates(){
