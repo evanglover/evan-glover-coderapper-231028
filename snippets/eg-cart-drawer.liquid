@@ -10,7 +10,7 @@
   }
 </style>
 
-<eg-cart-drawer class="eg-cart-drawer open{% if cart == empty %} is-empty{% endif %}">
+<eg-cart-drawer class="eg-cart-drawer{% if cart == empty %} is-empty{% endif %}">
   <div class="cart-drawer-overlay"></div> 
   <div class="cart-drawer">
     <fieldset>
@@ -103,7 +103,7 @@
           </div>
           {%- endfor -%} 
           {%- endif -%}
-
+ 
           {% comment %} If product to trigger upsell is present, and upsell product is not present, then show an upsell component for the upsell product {% endcomment %}
           {%- assign upsell_trigger_handles_string = "the-3p-fulfilled-snowboard" -%} 
           {%- assign upsell_trigger_handles_array = upsell_trigger_handles_string | split: ',' -%}

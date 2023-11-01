@@ -194,7 +194,7 @@ class EGCartDrawer extends HTMLElement {
         })
         .then((state) => {
           const parsedState = JSON.parse(state);
-          // update new information to the cart
+          // update new information to the cart by triggering the async refresh function in the quantity controller of another line item.
           this.closest("eg-cart-drawer").querySelector("eg-cart-drawer-qty").renderCartDrawerUpdates();
         });
     }
