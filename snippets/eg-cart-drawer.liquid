@@ -13,6 +13,12 @@
 <eg-cart-drawer class="eg-cart-drawer{% if cart == empty %} is-empty{% endif %}">
   <div class="cart-drawer-overlay"></div> 
   <div class="cart-drawer">
+    <form
+      action="{{ routes.cart_url }}"
+      id="CartDrawerForm"
+      class="cart-drawer-form"
+      method="post"
+    >
     <fieldset>
       <div class="cart-drawer-inner"> 
         <div class="cart-drawer-header">
@@ -34,12 +40,7 @@
           </a>
         </div>
         {%- endif -%}
-        <form
-          action="{{ routes.cart_url }}"
-          id="CartDrawerForm"
-          class="cart-drawer-form"
-          method="post"
-        >
+        
           <cart-drawer-items class="cart-drawer-items">
           {%- if cart != empty -%}
           {%- for item in cart.items -%}
@@ -177,7 +178,7 @@
           
 
           </cart-drawer-items> 
-        </form>
+        
       </div>
     </div>
 
@@ -205,6 +206,7 @@
           <!-- CTAs -->
 
           <div class="cart__ctas" {{ block.shopify_attributes }}>
+
             <noscript>
               <button type="submit" class="cart__update-button button button--secondary" form="CartDrawer-Form">
                 {{ 'sections.cart.update' | t }}
@@ -216,7 +218,7 @@
               id="CartDrawer-Checkout"
               class="cart__checkout-button button"
               name="checkout"
-              form="CartDrawer-Form"
+              form="CartDrawerForm"
               {% if cart == empty %}
                 disabled
               {% endif %}
@@ -225,8 +227,9 @@
             </button>
           </div>
         
+        </div>
       </div>
-    </div>
-  </fieldset>
+    </fieldset>
+  </form>
   </div>
 </eg-cart-drawer>
