@@ -61,6 +61,8 @@ class EGCartDrawer extends HTMLElement {
           })
           // once complete, enable the cart form
           .then((info) => {
+            // reconnect the fieldset
+            this.fieldSet = this.querySelector("fieldset");
             selfRef.cartFormEnable();
           })
           // catch errors and print to console
@@ -72,10 +74,12 @@ class EGCartDrawer extends HTMLElement {
 
     // while the cart is updating, disable all controls and set checkout text to ""
     cartFormDisable(){
+      console.log(this.fieldSet)
       this.fieldSet.disabled = true;
     }
 
     cartFormEnable(){
+      console.log(this.fieldSet)
       this.fieldSet.disabled = false;
     }
   }
