@@ -1,0 +1,232 @@
+{% comment %} Script "eg-cart-drawer.js" is called in header.liquid {% endcomment %}
+
+<style>
+  .eg-cart-drawer {
+    visibility: hidden;
+  }
+
+  .eg-cart-drawer.open {
+    visibility: visible;
+  }
+</style>
+
+<eg-cart-drawer class="eg-cart-drawer open{% if cart == empty %} is-empty{% endif %}">
+  <div class="cart-drawer-overlay"></div> 
+  <div class="cart-drawer">
+    <fieldset>
+      <div class="cart-drawer-inner"> 
+        <div class="cart-drawer-header">
+          <h2>{{ 'sections.cart.title' | t }}</h2>
+          <button
+            class="cart-drawer-close"
+            type="button"
+            onclick="this.closest('eg-cart-drawer').close()"
+          >
+            {% render 'icon-close' %}
+          </button>
+      </div>
+      <div class="cart-drawer-content">
+        {%- if cart == empty -%}
+        <div class="cart-drawer-empty">
+          <h2 class="cart__empty-text">{{ 'sections.cart.empty' | t }}</h2>
+          <a href="{{ routes.all_products_collection_url }}" class="button">
+            {{ 'general.continue_shopping' | t }}
+          </a>
+        </div>
+        {%- endif -%}
+        <form
+          action="{{ routes.cart_url }}"
+          id="CartDrawerForm"
+          class="cart-drawer-form"
+          method="post"
+        >
+          <cart-drawer-items class="cart-drawer-items">
+          {%- if cart != empty -%}
+          {%- for item in cart.items -%}
+            <div id="cart-drawer-item-{{ item.index | plus: 1 }}" class="cart-drawer-item">
+              {%- if item.image -%}
+              <img
+                class="cart-drawer-item-image"
+                src="{{ item.image | image_url: width: 300 }}"
+                width="150"
+                height="{{ 150 | divided_by: item.image.aspect_ratio | ceil }}"
+              >
+              {%- endif -%}
+              <div class="cart-item-detais">
+                <a href="{{ item.url }}" class="cart-item__name h4 break">
+                  {{- item.product.title | escape -}}
+                </a>
+
+                <span class="product-price price price--end">
+                  {{ item.final_line_price | money }}
+                </span>
+
+                <eg-cart-drawer-qty class="quantity-container">
+                  <button class="quantity-button no-js-hidden" name="minus" type="button">
+                    {% render 'icon-minus' %}
+                  </button>
+                  <input 
+                    class="quantity-input"
+                    type="number"
+                    data-variant-id="{{ item.variant.id }}"
+                    name="updates[]"
+                    value="{{ item.quantity }}" 
+                    {% # theme-check-disable %}
+                    data-cart-quantity="{{ cart | item_count_for_variant: item.variant.id }}"
+                    min="{{ item.variant.quantity_rule.min }}"
+                    {% if item.variant.quantity_rule.max != null %}
+                      max="{{ item.variant.quantity_rule.max }}"
+                    {% endif %} 
+                    step="{{ item.variant.quantity_rule.increment }}"
+                    {% # theme-check-enable %} 
+                    id="drawer-quantity-{{ item.index | plus: 1 }}"
+                    data-index="{{ item.index | plus: 1 }}"
+                  >
+                  <button class="quantity-button no-js-hidden" name="plus" type="button">
+                    {% render 'icon-plus' %}
+                  </button>
+  
+                  <eg-cart-drawer-remove-button
+                    id="CartDrawer-Remove-{{ item.index | plus: 1 }}"
+                    data-index="{{ item.index | plus: 1 }}"
+                  >
+                    <button
+                      type="button"
+                      class="button button--tertiary cart-remove-button"
+                      data-variant-id="{{ item.variant.id }}"
+                    >
+                      {% render 'icon-remove' %}
+                    </button>
+                  </eg-cart-drawer-remove-button>
+                </eg-cart-drawer-qty>
+              </div> 
+          </div>
+          {%- endfor -%} 
+          {%- endif -%}
+
+          {% comment %} If product to trigger upsell is present, and upsell product is not present, then show an upsell component for the upsell product {% endcomment %}
+          {%- assign upsell_trigger_handles_string = "the-3p-fulfilled-snowboard" -%} 
+          {%- assign upsell_trigger_handles_array = upsell_trigger_handles_string | split: ',' -%}
+          {%- assign upsell_handles_string = "the-multi-location-snowboard" -%}
+          {%- assign upsell_handles_array = upsell_handles_string | split: "," -%}
+          {%- assign upsell_handles_to_display = "" -%}
+          {% comment %} Check the cart for the trigger product {% endcomment %}
+          {%- for trigger_item in cart.items -%} 
+            {%- if upsell_trigger_handles_string contains trigger_item.product.handle -%}
+              {% comment %} Get the index of the trigger product {% endcomment %}
+              {%- assign trigger_index = false -%}
+              {%- for trigger_handle in upsell_trigger_handles_array -%}
+                {%- if trigger_handle == trigger_item.product.handle -%}
+                  {%- assign trigger_index = forloop.index0 -%}
+                {%- endif -%}
+              {%- endfor -%}
+              {%- if trigger_index -%}
+                {% comment %} Make sure the upsell product is not already in the cart {% endcomment %} 
+                {%- assign upsell_handle = upsell_handles_array[trigger_index] -%}
+                {%- assign render_upsell = true -%}
+                {%- for item in cart.items -%}  
+                  {%- if item.product.handle == upsell_handle -%} 
+                    {% comment %} The upsell product is already in the cart {% endcomment %}
+                    {%- assign render_upsell = false -%}
+                    {%- break -%} 
+                  {%- endif -%}
+                {%- endfor -%}
+                {%- if render_upsell -%}
+                  {% comment %} Add the upsell to the list of handles to render {% endcomment %}
+                  {%- assign upsell_handles_to_display = upsell_handles_to_display | append: upsell_handle | append: "," -%}
+                {%- endif -%}
+              {%- endif -%}
+            {%- endif -%}
+          {%- endfor -%}
+
+          {% comment %} Render the upsell section{% endcomment %}
+          {%- if upsell_handles_to_display != "" -%}
+            {%- assign upsell_handles_to_display_array = upsell_handles_to_display | split: "," -%}
+            <div>
+              <h3>You may also like...</h3>
+               
+              {%- for upsell_handle in upsell_handles_to_display_array -%} 
+                {%- assign upsell_product = all_products[upsell_handle] -%}
+                <div> 
+                  <eg-cart-drawer-upsell id="cart-drawer-item-upsell-{{ forloop.index }}" class="cart-drawer-item cart-drawer-upsell" data-quantity="1" data-variant-id="{{ upsell_product.first_available_variant.id }}">
+                    {%- if upsell_product.featured_image -%}
+                    <img
+                      class="cart-drawer-item-image"
+                      src="{{ upsell_product.featured_image | image_url: width: 300 }}"
+                      width="150"
+                      height="{{ 150 | divided_by: upsell_product.featured_image.aspect_ratio | ceil }}"
+                    >
+                    {%- endif -%}
+                    <div class="cart-item-detais">
+                      <a href="{{ upsell_product.url }}" class="cart-item__name h4 break">
+                        {{ upsell_product.title | escape }}
+                      </a>
+                      <span class="product-price price price--end">
+                        {{ upsell_product.price | money }} 
+                      </span>
+                      <button class="cart-drawer-upsell-atc">
+                        Add to Cart
+                      </button>
+                    </div> 
+                    
+                  </eg-cart-drawer-upsell>
+                </div> 
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+          
+
+          </cart-drawer-items> 
+        </form>
+      </div>
+    </div>
+
+          <div class="cart-drawer__footer" {{ block.shopify_attributes }}>
+            <div>
+              {%- if cart.cart_level_discount_applications.size > 0 -%}
+                <ul class="discounts list-unstyled" role="list" aria-label="{{ 'customer.order.discount' | t }}">
+                  {%- for discount in cart.cart_level_discount_applications -%}
+                    <li class="discounts__discount discounts__discount--end">
+                      {%- render 'icon-discount' -%}
+                      {{ discount.title }}
+                      (-{{ discount.total_allocated_amount | money }})
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              {%- endif -%}
+            </div>
+
+            <div class="totals" role="status">
+              <h2 class="totals__total">{{ 'sections.cart.estimated_total' | t }}</h2>
+              <p class="totals__total-value">{{ cart.total_price | money_with_currency }}</p>
+            </div>
+          </div>
+
+          <!-- CTAs -->
+
+          <div class="cart__ctas" {{ block.shopify_attributes }}>
+            <noscript>
+              <button type="submit" class="cart__update-button button button--secondary" form="CartDrawer-Form">
+                {{ 'sections.cart.update' | t }}
+              </button>
+            </noscript>
+
+            <button
+              type="submit"
+              id="CartDrawer-Checkout"
+              class="cart__checkout-button button"
+              name="checkout"
+              form="CartDrawer-Form"
+              {% if cart == empty %}
+                disabled
+              {% endif %}
+            >
+              {{ 'sections.cart.checkout' | t }}
+            </button>
+          </div>
+        
+      </div>
+    </div>
+  </fieldset>
+  </div>
+</eg-cart-drawer>
