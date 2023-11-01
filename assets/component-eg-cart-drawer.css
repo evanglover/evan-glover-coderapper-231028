@@ -1,6 +1,6 @@
 .eg-cart-drawer{
     display: flex;
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 100%;
     height: 100%;
